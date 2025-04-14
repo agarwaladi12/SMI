@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Metadata Fetcher",
+  "version": "1.0",
+  "description": "Fetches basic metadata from YouTube video pages for social media informatics.",
+  "permissions": [
+    "activeTab", // Access metadata of the currently active tab
+    "scripting",   // Allows injecting the content script
+    "tabs"         // Needed to send messages to content script
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png" // Optional: path to your 16x16 icon
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/watch*"], // Run only on YouTube video pages
+      "js": ["content.js"]
+    }
+  ],
+  "icons": { // Optional: Define icons shown in the extensions management page
+      "16": "icons/icon16.png"
+  }
+}
