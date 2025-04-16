@@ -1,37 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>YouTube Metadata</title>
-    <style>
-        body { font-family: sans-serif; width: 300px; padding: 10px; font-size: 14px; }
-        div { margin-bottom: 8px; }
-        strong { color: #333; }
-        #error { color: red; font-weight: bold; }
-        #loading { color: #888; }
-        pre {
-            white-space: pre-wrap; /* Allow wrapping */
-            word-wrap: break-word; /* Break long words */
-            background-color: #f4f4f4;
-            padding: 5px;
-            border: 1px solid #ddd;
-            max-height: 100px; /* Limit description height */
-            overflow-y: auto; /* Add scroll if needed */
-        }
-    </style>
+  <title>YouTube Metadata</title>
+  <style>
+    body { font-family: Arial, sans-serif; width: 280px; padding: 10px; }
+    #error { color: red; }
+    .label { font-weight: bold; }
+  </style>
 </head>
 <body>
-    <h3>YouTube Video Metadata</h3>
-    <div id="loading">Loading...</div>
-    <div id="error"></div>
-    <div id="metadataDisplay" style="display: none;">
-        <div><strong>Title:</strong> <span id="title"></span></div>
-        <div><strong>Channel:</strong> <span id="channel"></span></div>
-        <div><strong>Views:</strong> <span id="views"></span></div>
-        <div><strong>Uploaded:</strong> <span id="date"></span></div>
-        <div><strong>Video ID:</strong> <span id="videoId"></span></div>
-        <div><strong>Description:</strong> <pre id="description"></pre></div>
-        <div><small><strong>Fetched:</strong> <span id="fetchTime"></span></small></div>
-    </div>
-    <script src="popup.js"></script>
+  <h3>YouTube Metadata</h3>
+  <div id="loading">Loading...</div>
+  <div id="error"></div>
+  <div id="meta" style="display: none;">
+    <div><span class="label">Title:</span> <span id="title"></span></div>
+    <div><span class="label">URL:</span> <span id="url"></span></div>
+    <div><span class="label">Type:</span> <span id="type"></span></div>
+    <div><span class="label">Time:</span> <span id="time"></span></div>
+  </div>
+  <script src="popup.js"></script>
 </body>
 </html>
