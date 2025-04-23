@@ -4,6 +4,22 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
+
+function getYouTubeVideoId($url) {
+    $parsedUrl = parse_url($url);
+
+    if (strpos($url, 'watch') !== false && isset($parsedUrl['query'])) {
+        parse_str($parsedUrl['query'], $urlParams);
+        return $urlParams['v'] ?? null;
+    }
+
+    if (strpos($url, '/shorts/') !== false && isset($parsedUrl['path'])) {
+        $parts = explode('/', $parsedUrl['path']);
+        return $parts[2] ?? null;
+    }
+
+    return null;
+}
 // Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
@@ -64,8 +80,9 @@ if (isset($data['title'], $data['url'], $data['type'], $data['fetchTime'])) {
             file_put_contents('php://stderr', "$formattedFetchTime\n");
 
             // Extract video ID from URL
-            parse_str(parse_url($url, PHP_URL_QUERY), $urlParams);
-            $videoId = $urlParams['v'] ?? '';
+            //parse_str(parse_url($url, PHP_URL_QUERY), $urlParams);
+            //$videoId = $urlParams['v'] ?? '';
+            $videoId = getYouTubeVideoId($url);
 
             // Fetch likeCount and commentCount from YouTube API
             $apiKey = "AIzaSyC5pXUA4VhL7kwsUWWCVlA-Co1iO6wXAQ8";
@@ -82,9 +99,11 @@ if (isset($data['title'], $data['url'], $data['type'], $data['fetchTime'])) {
                 $commentCount = $apiData['items'][0]['statistics']['commentCount'] ?? 0;
             }
 
+            $userTags = isset($data['userTags']) ? json_encode($data['userTags']) : '[]';
+
             // Insert new record using prepared statement
-            $insertStmt = mysqli_prepare($connection, "INSERT INTO youtube_metadata (title, url, type, fetch_time, likes_count, comments_count) VALUES (?, ?, ?, ?, ?, ?)");
-            mysqli_stmt_bind_param($insertStmt, "ssssii", $title, $url, $type, $formattedFetchTime, $likeCount, $commentCount);
+            $insertStmt = mysqli_prepare($connection, "INSERT INTO youtube_metadata (title, url, type, fetch_time, likes_count, comments_count, tags) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            mysqli_stmt_bind_param($insertStmt, "ssssiis", $title, $url, $type, $formattedFetchTime, $likeCount, $commentCount, $userTags);
 
             if (mysqli_stmt_execute($insertStmt)) {
                 echo json_encode(["status" => "success", "message" => "Data saved successfully"]);

@@ -3,21 +3,97 @@
 <head>
   <title>YouTube Metadata</title>
   <style>
-    body { font-family: Arial, sans-serif; width: 280px; padding: 10px; }
-    #error { color: red; }
-    .label { font-weight: bold; }
+    body {
+      font-family: Arial, sans-serif;
+      width: 280px;
+      padding: 15px;
+      background-color: #f5f5f5;
+      color: #333;
+      margin: 0;
+    }
+
+    h3 {
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 18px;
+      color: #4A90E2;
+    }
+
+    #loading {
+      text-align: center;
+      font-size: 16px;
+      color: #888;
+    }
+
+    #error {
+      color: red;
+      font-size: 14px;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    #meta {
+      display: none;
+      margin-top: 10px;
+    }
+
+    .label {
+      font-weight: bold;
+      color: #555;
+    }
+
+    #meta div {
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    span#title,
+    span#url,
+    span#type,
+    span#time {
+      color: #333;
+    }
+
+    #url {
+      word-wrap: break-word;
+      color: #4A90E2;
+    }
+
+    #url:hover {
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    #saveButton {
+      display: block;
+      width: 100%;
+      margin-top: 15px;
+      padding: 8px;
+      background-color: #4A90E2;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #saveButton:hover {
+      background-color: #357ABD;
+    }
   </style>
 </head>
 <body>
   <h3>YouTube Metadata</h3>
   <div id="loading">Loading...</div>
   <div id="error"></div>
-  <div id="meta" style="display: none;">
+  <div id="meta">
     <div><span class="label">Title:</span> <span id="title"></span></div>
     <div><span class="label">URL:</span> <span id="url"></span></div>
     <div><span class="label">Type:</span> <span id="type"></span></div>
     <div><span class="label">Time:</span> <span id="time"></span></div>
+    <button id="saveButton" style="margin-top: 10px; width: 100%; padding: 8px; background-color: #4A90E2; color: white; border: none; cursor: pointer; font-size: 14px; border-radius: 5px;">Save Metadata</button>
   </div>
+
   <script src="popup.js"></script>
 </body>
 </html>
