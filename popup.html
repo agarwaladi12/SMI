@@ -1,80 +1,104 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>YouTube Metadata</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      width: 280px;
-      padding: 15px;
-      background-color: #f5f5f5;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f9;
       color: #333;
+      padding: 16px;
       margin: 0;
+      width: 100%;
+      max-width: 360px; /* 🔥 limit width nicely */
+      overflow-x: hidden; /* no horizontal scroll */
     }
 
     h3 {
-      text-align: center;
-      margin-bottom: 10px;
-      font-size: 18px;
-      color: #4A90E2;
-    }
-
-    #loading {
-      text-align: center;
-      font-size: 16px;
-      color: #888;
-    }
-
-    #error {
-      color: red;
-      font-size: 14px;
-      text-align: center;
-      margin-top: 10px;
+      margin: 0 0 12px 0;
+      font-size: 20px;
+      color: #202124;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 8px;
     }
 
     #meta {
-      display: none;
+      background-color: #ffffff;
+      padding: 14px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
       margin-top: 10px;
     }
 
-    .label {
-      font-weight: bold;
-      color: #555;
-    }
-
     #meta div {
-      margin-bottom: 8px;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+
+    .label {
+      font-weight: 600;
       font-size: 14px;
+      margin-right: 6px;
     }
 
-    span#title,
-    span#url,
-    span#type,
-    span#time {
-      color: #333;
+    .value {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      background-color: #e8f0fe;
+      color: #1a73e8;
+      max-width: 100%;
+      overflow-wrap: break-word;
     }
 
-    #url {
-      word-wrap: break-word;
-      color: #4A90E2;
+    .value.url {
+      background-color: #e6f4ea;
+      color: #188038;
     }
 
-    #url:hover {
-      text-decoration: underline;
-      cursor: pointer;
+    .value.type {
+      background-color: #fce8e6;
+      color: #d93025;
+    }
+
+    .value.time {
+      background-color: #fff4e5;
+      color: #f57c00;
+    }
+
+    #loading {
+      color: #666;
+      font-style: italic;
+    }
+
+    #error {
+      color: #d93025;
+      background-color: #fdecea;
+      padding: 8px;
+      border-radius: 5px;
+      font-size: 14px;
+      margin-bottom: 10px;
     }
 
     #saveButton {
-      display: block;
+      margin-top: 12px;
       width: 100%;
-      margin-top: 15px;
       padding: 8px;
       background-color: #4A90E2;
       color: white;
       border: none;
-      border-radius: 4px;
-      font-size: 16px;
       cursor: pointer;
+      font-size: 14px;
+      border-radius: 5px;
+      transition: background-color 0.2s ease;
     }
 
     #saveButton:hover {
@@ -86,12 +110,12 @@
   <h3>YouTube Metadata</h3>
   <div id="loading">Loading...</div>
   <div id="error"></div>
-  <div id="meta">
-    <div><span class="label">Title:</span> <span id="title"></span></div>
-    <div><span class="label">URL:</span> <span id="url"></span></div>
-    <div><span class="label">Type:</span> <span id="type"></span></div>
-    <div><span class="label">Time:</span> <span id="time"></span></div>
-    <button id="saveButton" style="margin-top: 10px; width: 100%; padding: 8px; background-color: #4A90E2; color: white; border: none; cursor: pointer; font-size: 14px; border-radius: 5px;">Save Metadata</button>
+  <div id="meta" style="display: none;">
+    <div><span class="label">Title:</span><span id="title" class="value"></span></div>
+    <div><span class="label">URL:</span><span id="url" class="value url"></span></div>
+    <div><span class="label">Type:</span><span id="type" class="value type"></span></div>
+    <div><span class="label">Time:</span><span id="time" class="value time"></span></div>
+    <button id="saveButton">Save Metadata</button>
   </div>
 
   <script src="popup.js"></script>
