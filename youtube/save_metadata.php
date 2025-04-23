@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 $data = json_decode(file_get_contents("php://input"), true);
 
 // Log received data for debugging
-file_put_contents('php://stderr', print_r($data, true));
+//file_put_contents('php://stderr', print_r($data, true));
 
 if (isset($data['title'], $data['url'], $data['type'], $data['fetchTime'])) {
     $connection = mysqli_connect("localhost", "root", "root", "youtube_research");
@@ -61,12 +61,8 @@ if (isset($data['title'], $data['url'], $data['type'], $data['fetchTime'])) {
         // Format fetchTime
         try {
             try {
-                // Clean fetchTime manually
-                $cleanFetchTime = preg_replace('/\.\d+Z$/', '', $fetchTime); // remove .xxxZ
-                $cleanFetchTime = str_replace('T', ' ', $cleanFetchTime); // replace T with space
-            
-                $dateTimeObj = new DateTime($cleanFetchTime);
-                $formattedFetchTime = $dateTimeObj->format('Y-m-d H:i:s');
+                date_default_timezone_set('America/Indiana/Indianapolis');
+                $formattedFetchTime = date('Y-m-d H:i:s');
             
                 // Extra sanity check
                 if ($formattedFetchTime === '1970-01-01 00:00:00' || strlen($fetchTime) < 10) {
@@ -77,33 +73,42 @@ if (isset($data['title'], $data['url'], $data['type'], $data['fetchTime'])) {
                 file_put_contents('php://stderr', "FetchTime parsing failed, using current time: $formattedFetchTime\n");
             }
 
-            file_put_contents('php://stderr', "$formattedFetchTime\n");
-
-            // Extract video ID from URL
-            //parse_str(parse_url($url, PHP_URL_QUERY), $urlParams);
-            //$videoId = $urlParams['v'] ?? '';
             $videoId = getYouTubeVideoId($url);
 
             // Fetch likeCount and commentCount from YouTube API
             $apiKey = "AIzaSyC5pXUA4VhL7kwsUWWCVlA-Co1iO6wXAQ8";
             $apiUrl = "https://www.googleapis.com/youtube/v3/videos?part=statistics&id=$videoId&key=$apiKey";
+            $snippetUrl = "https://www.googleapis.com/youtube/v3/videos?part=snippet&id=$videoId&key=$apiKey";
 
             $apiResponse = file_get_contents($apiUrl);
             $apiData = json_decode($apiResponse, true);
 
+            $snippetResponse = file_get_contents($snippetUrl);
+            $snippetData = json_decode($snippetResponse, true);
+
             $likeCount = 0;
             $commentCount = 0;
+            $viewCount = 0;
 
             if (!empty($apiData['items'][0]['statistics'])) {
                 $likeCount = $apiData['items'][0]['statistics']['likeCount'] ?? 0;
                 $commentCount = $apiData['items'][0]['statistics']['commentCount'] ?? 0;
+                $viewCount = $apiData['items'][0]['statistics']['viewCount'] ?? 0;
+                $publishedDate = $snippetData['items'][0]['snippet']['publishedAt'] ?? 0;
             }
 
-            $userTags = isset($data['userTags']) ? json_encode($data['userTags']) : '[]';
+            $cleanPublishTime = preg_replace('/\.\d+Z$/', '', $publishedDate); // remove .xxxZ
+            $cleanPublishTime = str_replace('T', ' ', $cleanPublishTime); // replace T with space
+            
+            $dateTimeObj = new DateTime($cleanPublishTime);
+            $formattedPublishTime = $dateTimeObj->format('Y-m-d H:i:s');
+
+
+            $userTags = isset($data['userTags']) ? $data['userTags'] : '';
 
             // Insert new record using prepared statement
-            $insertStmt = mysqli_prepare($connection, "INSERT INTO youtube_metadata (title, url, type, fetch_time, likes_count, comments_count, tags) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            mysqli_stmt_bind_param($insertStmt, "ssssiis", $title, $url, $type, $formattedFetchTime, $likeCount, $commentCount, $userTags);
+            $insertStmt = mysqli_prepare($connection, "INSERT INTO youtube_metadata (title, url, type, fetch_time, likes_count, comments_count, view_count, tags, publish_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            mysqli_stmt_bind_param($insertStmt, "ssssiiiss", $title, $url, $type, $formattedFetchTime, $likeCount, $commentCount, $viewCount, $userTags, $formattedPublishTime);
 
             if (mysqli_stmt_execute($insertStmt)) {
                 echo json_encode(["status" => "success", "message" => "Data saved successfully"]);

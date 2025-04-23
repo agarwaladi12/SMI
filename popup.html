@@ -80,15 +80,20 @@
     }
 
     #error {
-      color: #d93025;
-      background-color: #fdecea;
-      padding: 8px;
-      border-radius: 5px;
-      font-size: 14px;
-      margin-bottom: 10px;
-    }
+  display: none;
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #f5c6cb;
+  margin: 10px auto;
+  text-align: center;
+  font-size: 13px;
+  max-width: fit-content;
+  white-space: nowrap;
+}
 
-    #saveButton {
+#save, #viewDatabase, #add-tag-btn {
       margin-top: 12px;
       width: 100%;
       padding: 8px;
@@ -101,21 +106,111 @@
       transition: background-color 0.2s ease;
     }
 
-    #saveButton:hover {
+    #save:hover, #viewDatabase:hover, #add-tag-btn:hover {
       background-color: #357ABD;
     }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #333;
+      color: white;
+      padding: 15px 30px;
+      border-radius: 5px;
+      font-size: 14px;
+      max-width: 500px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      word-wrap: break-word;
+      z-index: 9999;
+      opacity: 0;
+      animation: fadeIn 0.5s forwards;
+      pointer-events: none;
+    }
+
+    .toast.fade-out {
+      animation: fadeOut 0.5s forwards;
+    }
+
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+
+    @keyframes fadeOut {
+      0% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+      }
+    }
+
+    #tags-section {
+      margin-top: 20px;
+      text-align: center; /* Center the button relative to the input */
+    }
+
+    #tag-input {
+      padding: 8px;
+      font-size: 14px;
+      width: calc(100% - 90px); /* Adjust width to leave space for the button */
+      margin-bottom: 10px; /* Add a gap between input and button */
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      transition: border-color 0.3s ease;
+    }
+
+    #tag-input:focus {
+      border-color: #4A90E2;
+      outline: none;
+    }
+
+    #tags-list {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center; /* Center the tags list */
+    }
+
+    .tag {
+      background-color: #4CAF50;
+      color: white;
+      padding: 5px 10px;
+      margin: 5px;
+      border-radius: 3px;
+      font-size: 14px;
+    }
+
   </style>
 </head>
 <body>
   <h3>YouTube Metadata</h3>
   <div id="loading">Loading...</div>
-  <div id="error"></div>
+  <div id="error" style="display: none; color: red;"></div>
   <div id="meta" style="display: none;">
     <div><span class="label">Title:</span><span id="title" class="value"></span></div>
     <div><span class="label">URL:</span><span id="url" class="value url"></span></div>
     <div><span class="label">Type:</span><span id="type" class="value type"></span></div>
     <div><span class="label">Time:</span><span id="time" class="value time"></span></div>
-    <button id="saveButton">Save Metadata</button>
+    <!-- Tag Section -->
+    <div id="tags-section">
+      <label for="tag-input" class="label">Add Tags:</label>
+      <input type="text" id="tag-input" placeholder="Enter a tag">
+      <button id="add-tag-btn">Add Tag</button>
+      <div id="tags-list"></div>
+    </div>
+    <button id="save">Save</button>
+    <button id="viewDatabase">View Database</button>
   </div>
 
   <script src="popup.js"></script>
