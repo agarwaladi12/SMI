@@ -4,6 +4,41 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
+$categoryMap = [
+    1 => 'Film & Animation',
+    2 => 'Autos & Vehicles',
+    10 => 'Music',
+    15 => 'Pets & Animals',
+    17 => 'Sports',
+    18 => 'Short Movies',
+    19 => 'Travel & Events',
+    20 => 'Gaming',
+    21 => 'Videoblogging',
+    22 => 'People & Blogs',
+    23 => 'Comedy',
+    24 => 'Entertainment',
+    25 => 'News & Politics',
+    26 => 'Howto & Style',
+    27 => 'Education',
+    28 => 'Science & Technology',
+    29 => 'Nonprofits & Activism',
+    30 => 'Movies',
+    31 => 'Anime/Animation',
+    32 => 'Action/Adventure',
+    33 => 'Classics',
+    34 => 'Comedy',
+    35 => 'Documentary',
+    36 => 'Drama',
+    37 => 'Family',
+    38 => 'Foreign',
+    39 => 'Horror',
+    40 => 'Sci-Fi/Fantasy',
+    41 => 'Thriller',
+    42 => 'Shorts',
+    43 => 'Shows',
+    44 => 'Trailers'
+];
+
 
 function getYouTubeVideoId($url) {
     $parsedUrl = parse_url($url);
@@ -89,12 +124,14 @@ if (isset($data['title'], $data['url'], $data['type'], $data['fetchTime'])) {
             $likeCount = 0;
             $commentCount = 0;
             $viewCount = 0;
+            $categoryID = 0;
 
             if (!empty($apiData['items'][0]['statistics'])) {
                 $likeCount = $apiData['items'][0]['statistics']['likeCount'] ?? 0;
                 $commentCount = $apiData['items'][0]['statistics']['commentCount'] ?? 0;
                 $viewCount = $apiData['items'][0]['statistics']['viewCount'] ?? 0;
                 $publishedDate = $snippetData['items'][0]['snippet']['publishedAt'] ?? 0;
+                $categoryID = $snippetData['items'][0]['snippet']['categoryId'] ?? 0;
             }
 
             $cleanPublishTime = preg_replace('/\.\d+Z$/', '', $publishedDate); // remove .xxxZ
@@ -105,10 +142,11 @@ if (isset($data['title'], $data['url'], $data['type'], $data['fetchTime'])) {
 
 
             $userTags = isset($data['userTags']) ? $data['userTags'] : '';
+            $categoryName = isset($categoryMap[$categoryID]) ? $categoryMap[$categoryID] : 'Unknown';
 
             // Insert new record using prepared statement
-            $insertStmt = mysqli_prepare($connection, "INSERT INTO youtube_metadata (title, url, type, fetch_time, likes_count, comments_count, view_count, tags, publish_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            mysqli_stmt_bind_param($insertStmt, "ssssiiiss", $title, $url, $type, $formattedFetchTime, $likeCount, $commentCount, $viewCount, $userTags, $formattedPublishTime);
+            $insertStmt = mysqli_prepare($connection, "INSERT INTO youtube_metadata (title, url, type, fetch_time, likes_count, comments_count, view_count, tags, publish_time, category) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            mysqli_stmt_bind_param($insertStmt, "ssssiiisss", $title, $url, $type, $formattedFetchTime, $likeCount, $commentCount, $viewCount, $userTags, $formattedPublishTime, $categoryName);
 
             if (mysqli_stmt_execute($insertStmt)) {
                 echo json_encode(["status" => "success", "message" => "Data saved successfully"]);

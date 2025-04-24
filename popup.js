@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function () {
     saveButton.textContent = 'Saving...';
 
     const payload = {
-      title: titleSpan.textContent,
+      title: (titleSpan.textContent).replace(/ - YouTube$/, ''),
       url: urlSpan.textContent,
       type: typeSpan.textContent,
       fetchTime: timeSpan.textContent,
