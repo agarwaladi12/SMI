@@ -36,6 +36,18 @@ document.addEventListener('DOMContentLoaded', function () {
       return null;
     }
   }
+  function checkIfVideoExists(url) {
+    fetch(`http://localhost:8888/youtube/check_video.php?url=${encodeURIComponent(url)}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.exists) {
+          // Add a green glow or message to indicate it's already saved
+          document.body.style.boxShadow = '0 0 10px 2px green';
+          showToast('Already Saved ✅');
+        }
+      })
+      .catch(err => console.error('Check video failed:', err));
+  }
 
   function showToast(message) {
     const toast = document.createElement('div');
@@ -91,6 +103,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     titleSpan.textContent = tab.title;
     urlSpan.textContent = url;
+    checkIfVideoExists(url);
     typeSpan.textContent = contentType;
     timeSpan.textContent = new Date().toLocaleString();
   }
