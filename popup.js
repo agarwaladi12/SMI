@@ -19,6 +19,11 @@ document.addEventListener('DOMContentLoaded', function () {
     return;
   }
 
+  function clearTags() {
+    userTags = [];
+    tagsList.innerHTML = '';
+  }
+
   let previousVideoId = null;
 
   function extractVideoId(url) {
@@ -41,12 +46,42 @@ document.addEventListener('DOMContentLoaded', function () {
       .then(res => res.json())
       .then(data => {
         if (data.exists) {
-          // Add a green glow or message to indicate it's already saved
-          document.body.style.boxShadow = '0 0 10px 2px green';
           showToast('Already Saved ✅');
+  
+          // If tags are found, populate them
+          if (data.tags && data.tags.trim() !== '') {
+            loadSavedTags(data.tags);
+          } else {
+            // No tags saved yet
+            clearTags();
+          }
+        } else{
+          clearTags();
         }
       })
       .catch(err => console.error('Check video failed:', err));
+  }
+  
+  function loadSavedTags(tagsString) {
+    userTags = []; 
+    tagsList.innerHTML = '';
+  
+    const tags = tagsString.split(',').map(tag => tag.trim()).filter(tag => tag !== '');
+  
+    tags.forEach(tag => {
+      const tagElement = document.createElement('span');
+      tagElement.classList.add('tag');
+      tagElement.textContent = tag;
+  
+      // Allow removing tag on click
+      tagElement.addEventListener('click', () => {
+        tagElement.remove();
+        userTags = userTags.filter(t => t !== tag);
+      });
+  
+      tagsList.appendChild(tagElement);
+      userTags.push(tag);
+    });
   }
 
   function showToast(message) {
@@ -113,12 +148,12 @@ document.addEventListener('DOMContentLoaded', function () {
     updateMetadata(tabs[0]);
   });
 
-  // Poll every 2 seconds
+  // Poll every 1 seconds
   setInterval(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
       updateMetadata(tabs[0]);
     });
-  }, 2000);
+  }, 1000);
 
   // Add Tag
   function addTag(tag) {

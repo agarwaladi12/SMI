@@ -1,5 +1,4 @@
 <?php
-
 // Allow CORS headers
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
@@ -19,9 +18,16 @@ if (!$url) {
   exit;
 }
 
-$stmt = $pdo->prepare("SELECT COUNT(*) FROM youtube_metadata WHERE url = ?");
+$stmt = $pdo->prepare("SELECT tags FROM youtube_metadata WHERE url = ?");
 $stmt->execute([$url]);
-$count = $stmt->fetchColumn();
+$video = $stmt->fetch(PDO::FETCH_ASSOC);
 
-echo json_encode(['exists' => $count > 0]);
+if ($video) {
+    echo json_encode([
+        'exists' => true,
+        'tags' => $video['tags'] ?? ''
+    ]);
+} else {
+    echo json_encode(['exists' => false]);
+}
 ?>
